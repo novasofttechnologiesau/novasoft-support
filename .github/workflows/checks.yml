@@ -1,0 +1,55 @@
+name: Release checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: disposable-ci-password
+          POSTGRES_DB: support_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U test -d support_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql+asyncpg://test:disposable-ci-password@localhost:5432/support_test
+      DATABASE_URL: postgresql+asyncpg://test:disposable-ci-password@localhost:5432/support_test
+      JWT_SECRET: CI-Only-Key-0123456789-abcdefgh-Never-Deployed
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: pip install -r apps/api/requirements-dev.txt
+      - run: alembic upgrade head && python -m pytest -q
+        working-directory: apps/api
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm audit --audit-level=moderate
+  desktop:
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build --workspace apps/desktop
+      - run: cargo check --manifest-path apps/desktop/src-tauri/Cargo.toml --locked

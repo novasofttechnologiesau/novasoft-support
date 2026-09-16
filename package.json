@@ -1,0 +1,16 @@
+{
+  "name": "novasoft-support",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/web",
+    "apps/desktop",
+    "packages/shared"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace apps/web",
+    "dev:desktop": "npm run tauri dev --workspace apps/desktop",
+    "build": "npm run build --workspace apps/web && npm run build --workspace apps/desktop"
+  },
+  "license": "MIT"
+}

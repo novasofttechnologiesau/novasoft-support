@@ -1,0 +1,49 @@
+# Node
+node_modules/
+dist/
+build/
+.vite/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# Env
+.env
+.env.local
+apps/api/.env
+apps/web/.env
+apps/desktop/.env
+
+# Rust / Tauri
+apps/desktop/src-tauri/target/
+apps/desktop/src-tauri/gen/
+
+# Uploads
+apps/api/uploads/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Release hygiene
+.claude/
+.env.*
+!.env.example
+*.tsbuildinfo
+.pytest_cache/
+*.db
+*.sqlite*
+*.dump
+*.sql

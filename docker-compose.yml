@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: novasoft
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/configure_local.py first}
+      POSTGRES_DB: novasoft_support
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - novasoft_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U novasoft -d novasoft_support"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  novasoft_pgdata:
